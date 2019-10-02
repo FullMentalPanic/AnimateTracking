@@ -4,6 +4,7 @@ import scrapy
 from animatetracking.items import *
 import re
 import logging
+import datetime
 
 date_dict ={
     '一': '01',
@@ -23,14 +24,20 @@ class animatetracking(scrapy.Spider):
             yield scrapy.Request(item['link'], callback=self.animatelist)
 
     def animateseason(self,response):
+        now = datetime.date.now()
+        max_date = now + datetime.timedelta(weeks = 13)
+        min_date = now - datetime.timedelta(weeks = 13)
         for resource in response.xpath("//div[@class='post-info pos-r pd10 post-side']/h2[@class='entry-title']"):           
             item = AnimatetrackingItem()
             item['link'] = resource.css('a::attr(href)').extract()[0]
             item['title'] = resource.css('a *::text').extract()[0]
             date = item['title']
-            item['date'] = '01-'+ date_dict[date[5]]+'-'+date[0:4] 
-            yield item
-
+            item['date'] = date[0:4]+'-'+date_dict[date[5]]+'-01'+ +'-'
+            date_time = datetime.datetime.strptime(item['date'], '%Y-%m-%d')
+            if ((min_date <= data_time) and (data_time <= max_date)):
+                yield item
+            else:
+                pass
     
     def animatelist(self,response):
         for resource in response.xpath("//h2/strong"):
