@@ -13,6 +13,7 @@ class AnimatetrackingItem(scrapy.Item):
     # name = scrapy.Field()
     link = scrapy.Field()
     date = scrapy.Field()
+    title = scrapy.Field()
     pass
 class AnimatelistItem(scrapy.Item):
     # define the fields for your item here like:

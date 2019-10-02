@@ -26,7 +26,8 @@ class animatetracking(scrapy.Spider):
         for resource in response.xpath("//div[@class='post-info pos-r pd10 post-side']/h2[@class='entry-title']"):           
             item = AnimatetrackingItem()
             item['link'] = resource.css('a::attr(href)').extract()[0]
-            date = resource.css('a *::text').extract()[0]
+            item['title'] = resource.css('a *::text').extract()[0]
+            date = item['title']
             item['date'] = '01-'+ date_dict[date[5]]+'-'+date[0:4] 
             yield item
 
