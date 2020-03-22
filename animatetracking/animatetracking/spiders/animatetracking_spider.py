@@ -37,18 +37,24 @@ class animatetracking(scrapy.Spider):
                 yield item
         for link in link_list:
             yield scrapy.Request(link, callback=self.animatelist)
-        #yield scrapy.Request(link_list[1], callback=self.animatelist)
    
     def animatelist(self,response):
         count = 0
+        table = response.xpath("//h1[@ref='postTitle']/text()").extract_first()        
         for resource in response.xpath("//div[@id='content-innerText']/h2"):
             item = AnimatelistItem()
+            item['table'] = table
             sel = resource.xpath('strong/span/text()')
             item['animatetitle'] = sel.extract_first()
             if item['animatetitle'] is None:
                 sel = resource.xpath('span/strong/text()')
                 item['animatetitle'] = sel.extract_first()
             item['introducation'] = resource.xpath("following-sibling::ul[1]/li[2]/text()").extract_first()
+            nums = []
+            if nums is []:
+                item = ''
+            else:
+                item['nums'] = ''.join(str(num) for num in nums)
             yield item
             count = count + 1
         print ("This season total animate is ", count)

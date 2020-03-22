@@ -17,7 +17,8 @@ class AnimatetrackingItem(scrapy.Item):
     pass
 class AnimatelistItem(scrapy.Item):
     # define the fields for your item here like:
-    # name = scrapy.Field()
+    table = scrapy.Field()
     animatetitle = scrapy.Field()
     introducation = scrapy.Field()
+    nums = scrapy.Field()
     pass
