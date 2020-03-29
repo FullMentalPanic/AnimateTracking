@@ -21,4 +21,5 @@ class AnimatelistItem(scrapy.Item):
     animatetitle = scrapy.Field()
     introducation = scrapy.Field()
     nums = scrapy.Field()
+    last_title = scrapy.Field()
     pass

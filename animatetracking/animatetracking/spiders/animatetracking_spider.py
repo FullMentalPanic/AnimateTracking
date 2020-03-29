@@ -6,6 +6,10 @@ import re
 import logging
 import datetime
 import time
+import re 
+from zhon.hanzi import punctuation
+import string
+
 
 date_dict ={
     '一': '01',
@@ -45,18 +49,32 @@ class animatetracking(scrapy.Spider):
             item = AnimatelistItem()
             item['table'] = table
             sel = resource.xpath('strong/span/text()')
-            item['animatetitle'] = sel.extract_first()
+            s = sel.extract_first()
+            item['animatetitle'] = self.remove_punctuation(s)
             if item['animatetitle'] is None:
                 sel = resource.xpath('span/strong/text()')
-                item['animatetitle'] = sel.extract_first()
+                s = sel.extract_first()
+                #m = s.translate(None, string.punctuation)
+                item['animatetitle'] = (re.sub("[{}]+".format(punctuation), " ", s.decode("utf-8")))
             item['introducation'] = resource.xpath("following-sibling::ul[1]/li[2]/text()").extract_first()
-            nums = []
-            if nums is []:
-                item = ''
-            else:
-                item['nums'] = ''.join(str(num) for num in nums)
+            item['nums']= '1'
+            item['last_title'] = ''
+            #item['nums'] = ''.join(str(num) for num in nums)
             yield item
             count = count + 1
         print ("This season total animate is ", count)
+
+    def remove_punctuation(self, line, strip_all=True):
+        if strip_all:
+            rule = re.compile(r"[^a-zA-Z0-9\u4e00-\u9fa5]")
+            line = rule.sub(' ',line)
+        else:
+            punctuation = """！？｡＂＃＄％＆＇（）＊＋－／：；＜＝＞＠［＼］＾＿｀｛｜｝～｟｠｢｣､、〃》「」『』【】〔〕〖〗〘〙〚〛〜〝〞〟〰〾〿–—‘’‛“”„‟…‧﹏"""
+            re_punctuation = "[{}]+".format(punctuation)
+            line = re.sub(re_punctuation, " ", line)
+
+        return line.strip()
+
+
 
 

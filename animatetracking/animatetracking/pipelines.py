@@ -24,7 +24,7 @@ class AnimatetrackingPipeline(object):
         self.cursor = self.connect.cursor()
         sql = "SELECT COUNT(*) FROM information_schema.tables WHERE table_name = \'TableList\'"
         self.cursor.execute(sql)
-        if not self.cursor.fetchone():
+        if self.cursor.fetchone()[0] == 0:
             sql = "CREATE TABLE TableList(date text, title text, status text)"
             self.cursor.execute(sql)
 
@@ -36,13 +36,14 @@ class AnimatetrackingPipeline(object):
             if not self.cursor.fetchone():
                 sql = """INSERT INTO TableList (date, title, status) VALUE (\'{}\', \'{}\', \'{}\')""".format(item["date"],item["title"],"Updating")
                 self.cursor.execute(sql)                                
-                #self.connect.commit()
+                self.connect.commit()
             #create new table 
             sql = """SELECT COUNT(*) FROM information_schema.tables WHERE table_name = \'" {}"\'""".format(item["title"])            
             self.cursor.execute(sql)
-            if not self.cursor.fetchone():
-                sql = "CREATE TABLE " +str(item["title"]) + " (animatetitle text, introducation text, nums text)"
+            if self.cursor.fetchone()[0] == 0:
+                sql = "CREATE TABLE " +str(item["title"]) + " (animatetitle text, introducation text, nums text, last_title text)"
                 self.cursor.execute(sql)
+
 
 
 
@@ -50,7 +51,7 @@ class AnimatetrackingPipeline(object):
             sql = """select * from {} where animatetitle = \'{}\'""".format(item["table"],item["animatetitle"])
             self.cursor.execute(sql)
             if not self.cursor.fetchone():
-                sql = """INSERT INTO {} (animatetitle, introducation, nums) VALUE (\'{}\', \'{}\', \'{}\')""".format(item["table"],item["animatetitle"],item["introducation"],item["nums"])
+                sql = """INSERT INTO {} (animatetitle, introducation, nums, last_title) VALUE (\'{}\', \'{}\', \'{}\',\'{}\')""".format(item["table"],item["animatetitle"],item["introducation"],item["nums"],item["last_title"])
                 self.cursor.execute(sql)                                
                 self.connect.commit()
         return item
