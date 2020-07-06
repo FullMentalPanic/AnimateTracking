@@ -10,26 +10,27 @@ from scrapy.exceptions import NotConfigured
 from animatetracking.items import AnimatetrackingItem,AnimatelistItem
 from animatetracking import settings
 
-
+DEBUG = 0
 class AnimatetrackingPipeline(object):
 
     def __init__(self):
-        self.connect = pymysql.connect(
-            host=settings.MYSQL_HOST,
-            db=settings.MYSQL_DBNAME,
-            user=settings.MYSQL_USER,
-            passwd=settings.MYSQL_PASSWD,
-            charset='utf8',
-            use_unicode=True)
-        self.cursor = self.connect.cursor()
-        sql = "SELECT COUNT(*) FROM information_schema.tables WHERE table_name = \'TableList\'"
-        self.cursor.execute(sql)
-        if self.cursor.fetchone()[0] == 0:
-            sql = "CREATE TABLE TableList(date text, title text, status text)"
+        if DEBUG is 0:
+            self.connect = pymysql.connect(
+                host=settings.MYSQL_HOST,
+                db=settings.MYSQL_DBNAME,
+                user=settings.MYSQL_USER,
+                passwd=settings.MYSQL_PASSWD,
+                charset='utf8',
+                use_unicode=True)
+            self.cursor = self.connect.cursor()
+            sql = "SELECT COUNT(*) FROM information_schema.tables WHERE table_name = \'TableList\'"
             self.cursor.execute(sql)
+            if self.cursor.fetchone()[0] == 0:
+                sql = "CREATE TABLE TableList(date text, title text, status text)"
+                self.cursor.execute(sql)
 
     def process_item(self, item, spider):
-        if isinstance(item,AnimatetrackingItem):
+        if isinstance(item,AnimatetrackingItem) and (DEBUG is 0):
             #update table list information
             sql = """select * from TableList where title = \'{}\'""".format(item["title"])
             self.cursor.execute(sql)
@@ -43,11 +44,13 @@ class AnimatetrackingPipeline(object):
             if self.cursor.fetchone()[0] == 0:
                 sql = "CREATE TABLE " +str(item["title"]) + " (animatetitle text, introducation text, nums text, last_title text)"
                 self.cursor.execute(sql)
+                sql = "ALTER TABLE "+ str(item["title"]) + " CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci"
+                self.cursor.execute(sql)
 
 
 
 
-        if isinstance(item,AnimatelistItem):
+        if isinstance(item,AnimatelistItem) and (DEBUG is 0):
             sql = """select * from {} where animatetitle = \'{}\'""".format(item["table"],item["animatetitle"])
             self.cursor.execute(sql)
             if not self.cursor.fetchone():
@@ -57,4 +60,5 @@ class AnimatetrackingPipeline(object):
         return item
 
     def close_spider(self, spider):
-        self.connect.close()
+        if DEBUG is 0:
+            self.connect.close()

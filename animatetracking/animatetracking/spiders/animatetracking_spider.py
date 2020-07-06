@@ -26,8 +26,8 @@ class animatetracking(scrapy.Spider):
 
     def parse(self, response):
         now = datetime.datetime.now()
-        max_date = now + datetime.timedelta(weeks = 13)
-        min_date = now - datetime.timedelta(weeks = 13)
+        max_date = now + datetime.timedelta(weeks = 4)
+        min_date = now - datetime.timedelta(weeks = 4)
         link_list = []
         for resource in response.xpath("//div[@class='post-info pos-r pd10 post-side']/h2[@class='entry-title']"):           
             item = AnimatetrackingItem()
@@ -50,6 +50,9 @@ class animatetracking(scrapy.Spider):
             item['table'] = table
             sel = resource.xpath('strong/span/text()')
             s = sel.extract_first()
+            if s is None:
+               sel = resource.xpath('span/strong/text()')
+               s = sel.extract_first()
             item['animatetitle'] = self.remove_punctuation(s)
             if item['animatetitle'] is None:
                 sel = resource.xpath('span/strong/text()')
