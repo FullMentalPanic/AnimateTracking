@@ -90,7 +90,7 @@ AUTOTHROTTLE_MAX_DELAY = 60
 #HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
 
 
-MYSQL_HOST = '192.168.3.4'
+MYSQL_HOST = 'localhost'
 MYSQL_DBNAME = 'Animate'
 MYSQL_USER = 'root'
 MYSQL_PASSWD = '123456'
