@@ -7,7 +7,7 @@
 
 import pymysql
 from scrapy.exceptions import NotConfigured
-from animatetracking.items import AnimatetrackingItem,AnimatelistItem
+from animatetracking.items import AnimatelistItem
 from animatetracking import settings
 
 DEBUG = 0
@@ -26,35 +26,32 @@ class AnimatetrackingPipeline(object):
             sql = "SELECT COUNT(*) FROM information_schema.tables WHERE table_name = \'TableList\'"
             self.cursor.execute(sql)
             if self.cursor.fetchone()[0] == 0:
-                sql = "CREATE TABLE TableList(date text, title text, status text)"
+                sql = "CREATE TABLE TableList(title text)"
                 self.cursor.execute(sql)
 
     def process_item(self, item, spider):
-        if isinstance(item,AnimatetrackingItem) and (DEBUG is 0):
+        if (DEBUG is 0):
             #update table list information
-            sql = """select * from TableList where title = \'{}\'""".format(item["title"])
+            sql = """select * from TableList where title = \'{}\'""".format(item["table"])
             self.cursor.execute(sql)
             if not self.cursor.fetchone():
-                sql = """INSERT INTO TableList (date, title, status) VALUE (\'{}\', \'{}\', \'{}\')""".format(item["date"],item["title"],"Updating")
+                sql = """INSERT INTO TableList (title) VALUE (\'{}\')""".format(item["table"])
                 self.cursor.execute(sql)                                
                 self.connect.commit()
             #create new table 
-            sql = """SELECT COUNT(*) FROM information_schema.tables WHERE table_name = \'" {}"\'""".format(item["title"])            
+            sql = """SELECT COUNT(*) FROM information_schema.tables WHERE table_name = \'"""+item["table"]+ """\'"""         
             self.cursor.execute(sql)
+            #print(self.cursor.fetchone()[0])
             if self.cursor.fetchone()[0] == 0:
-                sql = "CREATE TABLE " +str(item["title"]) + " (animatetitle text, introducation text, nums text, last_title text)"
+                sql = "CREATE TABLE " +item["table"]+" (id INT AUTO_INCREMENT PRIMARY KEY, animatetitle VARCHAR(255), othertitle text, cross_s VARCHAR(255), nums INT, last_title VARCHAR(255))"
                 self.cursor.execute(sql)
-                sql = "ALTER TABLE "+ str(item["title"]) + " CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci"
+                sql = "ALTER TABLE " + item["table"]+ " CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci"
                 self.cursor.execute(sql)
 
-
-
-
-        if isinstance(item,AnimatelistItem) and (DEBUG is 0):
             sql = """select * from {} where animatetitle = \'{}\'""".format(item["table"],item["animatetitle"])
             self.cursor.execute(sql)
             if not self.cursor.fetchone():
-                sql = """INSERT INTO {} (animatetitle, introducation, nums, last_title) VALUE (\'{}\', \'{}\', \'{}\',\'{}\')""".format(item["table"],item["animatetitle"],item["introducation"],item["nums"],item["last_title"])
+                sql = """INSERT INTO {} (animatetitle, othertitle, cross_s, nums, last_title) VALUE (\'{}\',\'{}\',\'{}\', \'{}\',\'{}\')""".format(item["table"],item["animatetitle"],item["othertitle"],item["cross"],item["nums"],item["last_title"])
                 self.cursor.execute(sql)                                
                 self.connect.commit()
         return item
