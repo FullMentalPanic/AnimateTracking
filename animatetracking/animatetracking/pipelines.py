@@ -23,21 +23,9 @@ class AnimatetrackingPipeline(object):
                 charset='utf8',
                 use_unicode=True)
             self.cursor = self.connect.cursor()
-            sql = "SELECT COUNT(*) FROM information_schema.tables WHERE table_name = \'TableList\'"
-            self.cursor.execute(sql)
-            if self.cursor.fetchone()[0] == 0:
-                sql = "CREATE TABLE TableList(title text)"
-                self.cursor.execute(sql)
 
     def process_item(self, item, spider):
         if (DEBUG is 0):
-            #update table list information
-            sql = """select * from TableList where title = \'{}\'""".format(item["table"])
-            self.cursor.execute(sql)
-            if not self.cursor.fetchone():
-                sql = """INSERT INTO TableList (title) VALUE (\'{}\')""".format(item["table"])
-                self.cursor.execute(sql)                                
-                self.connect.commit()
             #create new table 
             sql = """SELECT COUNT(*) FROM information_schema.tables WHERE table_name = \'"""+item["table"]+ """\'"""         
             self.cursor.execute(sql)
