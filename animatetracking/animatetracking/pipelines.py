@@ -15,7 +15,7 @@ import os.path
 
 
 DEBUG = 0
-basePath='/home/liang/hdd/d5/animate'
+basePath='/home/liang/hdd/d4/recording'
 class AnimatetrackingPipeline(object):
     def __init__(self):
         # remove SQL support
