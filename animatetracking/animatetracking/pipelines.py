@@ -62,7 +62,7 @@ class AnimatetrackingPipeline(object):
                 self.pd_dict.update({item["table"]: df})
 
         if item['animatetitle'] not in self.pd_dict[item["table"]]['animatetitle'].values:
-            self.pd_dict[item["table"]] = self.pd_dict[item["table"]].append(
+            self.pd_dict[item["table"]] = self.pd_dict[item["table"]]._append(
                 {'animatetitle' : item['animatetitle'], 'othertitle' : item['othertitle'], 'cross_s' : item['cross'],'nums':item['nums'], 'last_title':item['last_title']}, 
                 ignore_index = True)
 
